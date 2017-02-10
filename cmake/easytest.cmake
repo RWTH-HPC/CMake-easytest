@@ -7,6 +7,91 @@
 # Written by Alexander Haase, alexander.haase@rwth-aachen.de
 #
 
+# The following keys will be searched in the tests main source file. Tests may
+# use additional keywords, but won't get extracted by default so hooks have to
+# be used to get their values.
+#
+set(EASYLIST_COMMON_KEYS
+	COMPILE # Flags for compiling the target.
+	PASS    # PASS_EXPRESSION for test target.
+	FAIL    # FAIL_EXPRESSION for test target.
+)
+
+
+# Default compile hook.
+#
+# This hook adds a new executable target for test configuration CONFIG. It may
+# be replaced to call a custom build script.
+#
+# Parameters:
+#   TARGET Binary target name.
+#   CONFIG Test configuration.
+#
+#   Additional arguments represent the source files for the executable to build.
+#
+macro (easytest_hook_compile TARGET CONFIG)
+	add_executable(${TARGET} ${ARGN})
+endmacro ()
+
+
+# Default post-compile hook.
+#
+# This hook sets additional parameters for the binary target depending on the
+# previously defined configuration in the main source file.
+#
+# Parameters:
+#   TARGET Binary target name.
+#   CONFIG Test configuration.
+#
+#   Additional arguments represent the source files for the executable to build.
+#
+macro (easytest_hook_post_compile TARGET CONFIG)
+	target_compile_definitions(${TARGET} PRIVATE ${EASYTEST_COMPILE})
+endmacro ()
+
+
+# Default test hook.
+#
+# This hook adds a new test target for test configuration CONFIG. It may be used
+# to define custom test invocations.
+#
+# Parameters:
+#   TARGET Test target name.
+#   BINARY Binary target name.
+#   CONFIG Test configuration.
+#
+#   Additional arguments represent the source files for the executable to build.
+#
+macro (easytest_hook_test TARGET BINARY CONFIG)
+	add_test(${TARGET} ${BINARY})
+endmacro ()
+
+
+# Default post-test hook.
+#
+# This hook sets the attributes for test TARGET. It may be used to set
+# additional arguments for the test.
+#
+# Parameters:
+#   TARGET Test target name.
+#   CONFIG Test configuration.
+#
+#   Additional arguments represent the source files for the executable to build.
+#
+macro (easytest_hook_post_test TARGET CONFIG)
+	if (EASYTEST_PASS)
+		set_tests_properties(${TARGET} PROPERTIES PASS_REGULAR_EXPRESSION
+		                     "${EASYTEST_PASS}")
+	endif ()
+
+	if (EASYTEST_FAIL)
+		set_tests_properties(${TARGET} PROPERTIES FAIL_REGULAR_EXPRESSION
+		                     "${EASYTEST_FAIL}")
+	endif ()
+endmacro ()
+
+
+
 # Get a keyword from FILE.
 #
 # This function will be used to get a key from FILE. Each line prefixed with the
@@ -18,7 +103,7 @@
 #   DEST Where to store matches.
 #   FILE Where to search.
 #
-function(easytest_get_key KEY DEST FILE)
+function (easytest_get_key KEY DEST FILE)
 	# Search for KEY in FILE and get all lines with KEY.
 	file(STRINGS ${FILE} TMP REGEX "${KEY}:")
 	if (TMP)
@@ -35,7 +120,44 @@ function(easytest_get_key KEY DEST FILE)
 		# Store the found matches in DEST (in parent scope).
 		set(${DEST} "${BUFFER}" PARENT_SCOPE)
 	endif ()
-endfunction()
+endfunction ()
+
+
+# Add a new test configuration.
+#
+# This function will add a new testcase for a source file with a given
+# configuration. Extra sources may be set as additional parameters, but only the
+# first source file will be evaluated for keys.
+#
+# Parameters:
+#   PREFIX      Test prefix.
+#   CONFIG      Test configuration.
+#   MAIN_SOURCE Main source file.
+#
+#   Additional parameters will be used as additional source files for
+#   compilation, but will not be evaluated.
+#
+function (easytest_add_test_config PREFIX CONFIG MAIN_SOURCE)
+	# Get individual config keys from main source file. Individual keys will
+	# override the global test key values.
+	foreach (KEY ${EASYLIST_COMMON_KEYS})
+		easytest_get_key(${KEY}-${CONFIG} EASYTEST_${KEY} ${MAIN_SOURCE})
+	endforeach ()
+
+	# Set the name of the targets to be used for test and binary.
+	set(EASYTEST_TEST_TARGET "${PREFIX}-${CONFIG}")
+	set(EASYTEST_BIN_TARGET "testbin-${EASYTEST_TEST_TARGET}")
+
+	# Call the hooks for compile and test creation.
+	easytest_hook_compile(${EASYTEST_BIN_TARGET} ${CONFIG} ${MAIN_SOURCE}
+	                      ${ARGN})
+	easytest_hook_post_compile(${EASYTEST_BIN_TARGET} ${CONFIG} ${MAIN_SOURCE}
+	                           ${ARGN})
+	easytest_hook_test(${EASYTEST_TEST_TARGET} ${EASYTEST_BIN_TARGET} ${CONFIG}
+	                   ${MAIN_SOURCE} ${ARGN})
+	easytest_hook_post_test(${EASYTEST_TEST_TARGET} ${CONFIG} ${MAIN_SOURCE}
+	                        ${ARGN})
+endfunction ()
 
 
 # Add a new test file.
@@ -72,14 +194,26 @@ function (easy_add_test)
 				string(REPLACE " " ";" LINE "${LINE}")
 				list(APPEND EASYTEST_CONFIGS ${LINE})
 			endforeach ()
-		endif ()
 
 		# If still no configs could be found, use the default configuration with
 		# no label.
+		else ()
+			set(EASYTEST_CONFIGS "CHECK")
+		endif ()
 	endif ()
 
 
-	message("PREFIX: ${EASYTEST_PREFIX}")
-	message("SOURCES: ${EASYTEST_SOURCES}")
-	message("CONFIGS: ${EASYTEST_CONFIGS}")
+	# Search for main configuration keys in main source file. The found values
+	# may be overridden by individual config keys.
+	list(GET EASYTEST_SOURCES 0 MAIN_SOURCE)
+	foreach (KEY ${EASYLIST_COMMON_KEYS})
+		easytest_get_key(${KEY} EASYTEST_${KEY} ${MAIN_SOURCE})
+	endforeach ()
+
+
+	# Add a new test for each configuration.
+	foreach (CONFIG ${EASYTEST_CONFIGS})
+		easytest_add_test_config(${EASYTEST_PREFIX} ${CONFIG}
+		                         ${EASYTEST_SOURCES})
+	endforeach ()
 endfunction ()
