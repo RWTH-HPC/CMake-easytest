@@ -12,9 +12,15 @@
 # be used to get their values.
 #
 set(EASYLIST_COMMON_KEYS
-	COMPILE # Flags for compiling the target.
-	PASS    # PASS_EXPRESSION for test target.
-	FAIL    # FAIL_EXPRESSION for test target.
+	COMPILE_FLAGS    # Flags for compiling the target.
+	COMPILE_INCLUDES # Directories to include for compiling target.
+	LINK             # Libraries to link on target.
+	LINKER_FLAGS     # Flags for linking the target.
+
+	RUN         # How to run the test.
+	ENVIRONMENT # Environment variables for running the test.
+	PASS        # PASS_EXPRESSION for test target.
+	FAIL        # FAIL_EXPRESSION for test target.
 )
 
 
@@ -46,7 +52,9 @@ endmacro ()
 #   Additional arguments represent the source files for the executable to build.
 #
 macro (easytest_hook_post_compile TARGET CONFIG)
-	target_compile_definitions(${TARGET} PRIVATE ${EASYTEST_COMPILE})
+	target_include_directories(${TARGET} PRIVATE ${EASYTEST_COMPILE_INCLUDES})
+	target_compile_options(${TARGET} PRIVATE ${EASYTEST_COMPILE_FLAGS})
+	target_link_libraries(${TARGET} ${EASYTEST_LINK})
 endmacro ()
 
 
@@ -79,15 +87,12 @@ endmacro ()
 #   Additional arguments represent the source files for the executable to build.
 #
 macro (easytest_hook_post_test TARGET CONFIG)
-	if (EASYTEST_PASS)
-		set_tests_properties(${TARGET} PROPERTIES PASS_REGULAR_EXPRESSION
-		                     "${EASYTEST_PASS}")
-	endif ()
-
-	if (EASYTEST_FAIL)
-		set_tests_properties(${TARGET} PROPERTIES FAIL_REGULAR_EXPRESSION
-		                     "${EASYTEST_FAIL}")
-	endif ()
+	set_tests_properties(${TARGET} PROPERTIES PASS_REGULAR_EXPRESSION
+	                     "${EASYTEST_PASS}")
+	set_tests_properties(${TARGET} PROPERTIES FAIL_REGULAR_EXPRESSION
+	                     "${EASYTEST_FAIL}")
+	set_tests_properties(${TARGET} PROPERTIES ENVIRONMENT
+	                     "${EASYTEST_ENVIRONMENT}")
 endmacro ()
 
 

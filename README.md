@@ -75,8 +75,11 @@ For adding a new test file, simply call `easy_add_test()` with the following par
 The main (first) source file will be evaluated for the test configurations. Each key must be  terminated with a colon. The following keys may be defined to set parameters for creating the tests. Except for `CONFIGS`, each key may be defined global as `KEY`, or for a specific configuration as `KEY-CONFIG`, where the configuration-specific key will overwrite the global value. Each key may be defined multiple times - the values will be stored in an array.
 
 * `CONFIGS`: Space-delimited list of configurations defined in this test file.
-* `COMPILE`: Add compile definitions for the test binary, e.g. `-DWITH_ERROR`.
+* `COMPILE_FLAGS`: Add compile definitions for the test binary, e.g. `-DWITH_ERROR`.
+* `COMPILE_INCLUDES`: Add include directories for the test binary, e.g. `../src`.
 * `LINK`: Linker-flags for the test binary, e.g. to link against a library.
+* `RUN`: How to run the test.
+* `ENVIRONMENT`: Environment variables for running the test.
 * `PASS`: Set the tests `PASS_REGULAR_EXPRESSION` attribute.
 * `FAIL`: Set the tests `FAIL_REGULAR_EXPRESSION` attribute.
 
