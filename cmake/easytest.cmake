@@ -156,7 +156,8 @@ endfunction ()
 function (easytest_add_test_config PREFIX CONFIG MAIN_SOURCE)
 	# Set common variables for this target.
 	set(TEST_TARGET "${PREFIX}-${CONFIG}")
-	set(BINARY "testbin-${TEST_TARGET}")
+	set(BINARY_TARGET "testbin-${TEST_TARGET}")
+	set(BINARY "$<TARGET_FILE:${BINARY_TARGET}>")
 
 
 	# Get individual config keys from main source file. Individual keys will
@@ -166,15 +167,15 @@ function (easytest_add_test_config PREFIX CONFIG MAIN_SOURCE)
 	endforeach ()
 
 	# Postprocess RUN key, as add_test needs a list of arguments, but RUN is a
-	# string. This expression will replace spaces by colons to transform RUN
-	# into a list. Escaped spaces are ignored, but it can't handle quotes.
-	string(REGEX REPLACE "([^\\]) " "\\1;" EASYTEST_RUN "${EASYTEST_RUN}")
+	# string. To accomplish this and to allow pipes in the command, the whole
+	# string will be used as argument for sh.
+	set(EASYTEST_RUN sh -c "${EASYTEST_RUN}")
 
 
 	# Call the hooks for compile and test creation.
-	easytest_hook_compile(${BINARY} ${CONFIG} ${MAIN_SOURCE} ${ARGN})
-	easytest_hook_post_compile(${BINARY} ${CONFIG} ${MAIN_SOURCE})
-	easytest_hook_test(${TEST_TARGET} ${BINARY} ${CONFIG} ${MAIN_SOURCE})
+	easytest_hook_compile(${BINARY_TARGET} ${CONFIG} ${MAIN_SOURCE} ${ARGN})
+	easytest_hook_post_compile(${BINARY_TARGET} ${CONFIG} ${MAIN_SOURCE})
+	easytest_hook_test(${TEST_TARGET} ${BINARY_TARGET} ${CONFIG} ${MAIN_SOURCE})
 	easytest_hook_post_test(${TEST_TARGET} ${CONFIG} ${MAIN_SOURCE})
 endfunction ()
 

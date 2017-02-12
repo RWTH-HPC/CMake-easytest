@@ -87,7 +87,7 @@ The main (first) source file will be evaluated for the test configurations. Each
 
 The key values will be stripped from leading and trailing whitespace. Expressions in the format `%[A-Za-z0-9_-]*` will be substituted by CMake variables with the same name (without the percentage sign). The following common expressions may be used to get test data:
 
-* `%BINARY`: The name of the test binary target. It may be used as first argument for `RUN` to call the binary or at any other position in conjunction with the CMake generator expression `$<TARGET_FILE:%BINARY>`.
+* `%BINARY`: Path to the binary. This is equivalent to `$<TARGET_FILE:testbin-${PREFIX}-${CONFIG}>`. *This expression can only be used in the configuration-specific keys!*
 
 *Additional keys may be defined and evaluated by custom hooks (see below).*
 
