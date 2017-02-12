@@ -11,9 +11,9 @@ CMake module for easy test integration.
 
 This CMake module provides an easy interface for adding tests to your project. Instead of defining each test case in a separate file, building the test binary, defining the test case, etc. you simply add a test file with everything included. Each file contains everything to know about the tests to run, so no additional configuration is required in CMake.
 
-In short, this module is only a script for extracting all parameters for `add_executable()` and `add_test()` from a source file. But in combination with different configurations for the same source file, one may define a lot of tests in just one source file.
+In short, this module is a script for extracting all parameters for `add_executable()` and `add_test()` from a source file. But in combination with different configurations for the same source file, one may define lots of tests in just one source file.
 
-Let's take a little example: You have a small function to calculate the square of a number. If you want to test this function with common CMake functions, you'll need at least one source file calls for `add_executable()` and `add_test()`  for each corner case. With *CMake-easytest* it is as simple as this:
+Let's look at a small example: You have a function to calculate the square of a number. If you want to test this function with common CMake functions, you'll need at least one source file calls for `add_executable()` and `add_test()`  for each corner case. With *CMake-easytest* it is as simple as this:
 
 ```C
 #include <stdio.h>
@@ -67,12 +67,12 @@ set(CMAKE_MODULE_PATH
 
 For adding a new test file, simply call `easy_add_test()` with the following parameters:
 * `PREFIX`: *(required)* Prefix for tests. Tests will be named `${PREFIX}_${CONFIG}`.
-* `SOURCES`: *(required)* Source files of the test. Only the first file is evaluated for the easytest configuration, additional files will be used for compilation only.
-* `CONFIGS`: Set configurations to add test cases for. If not defined, the `CONFIGS` key in the main source file will be used. It is recommended to use this option only, if not all configurations defined in the main source file should be handled.
+* `SOURCES`: *(required)* Source files for the test binary. Only the first file is evaluated for the easytest configuration, additional files will be used for compilation only.
+* `CONFIGS`: Set configurations to add test cases for. If not defined, the `CONFIGS` key in the main source file will be used. *It is recommended to use this option only, if not all configurations defined in the main source file should be handled.*
 
 #### Configuration in main source file
 
-The main (first) source file will be evaluated for the test configurations. Each key must be prefixed by a space character and terminates with a colon. The following keys may be defined to define parameters for creating the tests. Except for `CONFIGS`, each key may be defined global as `KEY`, or for a specific configuration as `CONFIG-KEY`, where the configuration-specific key will overwrite the global value. Each key may be defined multiple times - the values will be stored in an array.
+The main (first) source file will be evaluated for the test configurations. Each key must be  terminated with a colon. The following keys may be defined to set parameters for creating the tests. Except for `CONFIGS`, each key may be defined global as `KEY`, or for a specific configuration as `KEY-CONFIG`, where the configuration-specific key will overwrite the global value. Each key may be defined multiple times - the values will be stored in an array.
 
 * `CONFIGS`: Space-delimited list of configurations defined in this test file.
 * `COMPILE`: Add compile definitions for the test binary, e.g. `-DWITH_ERROR`.
