@@ -142,6 +142,53 @@ All common keys can be accessed via `EASYTEST_${KEY}` variables.
 For custom keys, you may use `easytest_get_key(KEY DEST MAIN_SOURCE)`. It will search for `KEY` in `MAIN_SOURCE` and stores all matches in `DEST`. Remember to call this function for `KEY` and `KEY-CONFIG`, if the key may be defined global and per configuration.
 
 
+## Recommendations
+
+* Try to avoid using hooks for everything. E.g. if your tests use OpenMP, don't define the `easytest_hook_post_compile` hook for adding the OpenMP compiler flags, as they can be accessed with the `OpenMP_C_FLAGS` variable. You might consider using something like this:
+
+  ```C
+  #include <stdio.h>
+  #include <omp.h>
+
+  int main ()
+  {
+	#pragma omp parallel
+	{
+		printf("%d of %d\n", omp_get_thread_num() + 1, omp_get_num_threads());
+	}
+  }
+
+  /* CMake-easytest configuration.
+   *
+   * COMPILE_FLAGS: %OpenMP_C_FLAGS
+   * LINK: %OpenMP_C_FLAGS
+   */
+  ```
+
+* This also applies to the creation of tests: Instead of defining the `easytest_hook_test` hook to sort the output of the test case above by rank, you might consider to use variables:
+
+  ```CMake
+  include(easytest)
+  find_package(OpenMP REQUIRED)
+
+  set(sort "sort -n")
+  easy_add_test(PREFIX OpenMP_thread_num SOURCES openmp.c)
+  ```
+
+  And use them in the test file:
+  ```C
+  /* CMake-easytest configuration.
+   *
+   * COMPILE_FLAGS: %OpenMP_C_FLAGS
+   * LINK: %OpenMP_C_FLAGS
+   *
+   * ENVIRONMENT: OMP_NUM_THREADS=4
+   * RUN-CHECK: %BINARY | %sort
+   * PASS: 1.*2.*3.*4
+   */
+  ```
+
+
 ## Contribute
 
 Anyone is welcome to contribute. Simply fork this repository, make your changes **in an own branch** and create a pull-request for your change. Please do only one feature per pull-request.
