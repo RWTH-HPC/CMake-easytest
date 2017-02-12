@@ -86,6 +86,56 @@ The key values will be stripped from leading and trailing whitespace. Expression
 
 *Additional keys may be defined and evaluated by custom hooks (see below).*
 
+## Hooks
+
+It may be necessary to modify steps of the test definition, e.g. to use a special command for building the test binary. To accomplish this, you may define the following hooks to **override** the internal ones:
+
+* `easytest_hook_compile(TARGET CONFIG MAIN_SOURCE ...)`
+
+  This hook adds a new executable target for test configuration `CONFIG`. It may be replaced to call a custom build script.
+
+  **Parameters:**
+  * `TARGET`: Target name to use for binary. This name **must** be used, otherwise other hooks can't find the binary.
+  * `CONFIG`: The configuration to build. You may use this to search for custom keys (see below). *You don't need to search for common keys, as these have been searched before. Access them via `EASYTEST_${KEY}`.*
+  * `MAIN_SOURCE`: The main source file, where to search for configuration keys and other data.
+  * `...`: All additional parameters are source files for building the binary target.
+
+  **Note:** This hook is for compile-tasks only. If you just want to e.g. add custom flags to the target, the next hook will be yours!
+
+* `easytest_hook_post_compile(BINARY_TARGET CONFIG MAIN_SOURCE)`
+
+  This hook will be used to modify the binary test target for your needs, e.g. to add specific compile flags not set in the test file. At the time of writing the intention was to e.g. call other functions for the executable target, to e.g. register code coverage and sanitizers done by external CMake modules.
+
+  **Parameters:**
+  * `BINARY_TARGET`: Binary target name.
+  * `CONFIG`: The configuration to build. You may use this to search for custom keys (see below). *You don't need to search for common keys, as these have been searched before. Access them via `EASYTEST_${KEY}`.*
+  * `MAIN_SOURCE`: The main source file, where to search for configuration keys and other data.
+
+* `easytest_hook_test(TEST_TARGET BINARY_TARGET CONFIG MAIN_SOURCE)`
+
+  This hook adds a new test target for test configuration `CONFIG`. It may be replaced to configure specific test runs.
+
+  **Parameters:**
+  * `TEST_TARGET`: Target name to use for test. This name **must** be used, otherwise other hooks can't find the binary.
+  * `BINARY_TARGET`: Binary target name.
+  * `CONFIG`: The configuration to build. You may use this to search for custom keys (see below). *You don't need to search for common keys, as these have been searched before. Access them via `EASYTEST_${KEY}`.*
+  * `MAIN_SOURCE`: The main source file, where to search for configuration keys and other data.
+
+* `easytest_hook_post_test(TEST_TARGET CONFIG MAIN_SOURCE)`
+
+  This hook may be used to configure the test target, e.g. set dependencies.
+
+   **Parameters:**
+   * `TEST_TARGET`: Test target name.
+   * `CONFIG`: The configuration to build. You may use this to search for custom keys (see below). *You don't need to search for common keys, as these have been searched before. Access them via `EASYTEST_${KEY}`.*
+   * `MAIN_SOURCE`: The main source file, where to search for configuration keys and other data.
+
+#### Accessing keys
+
+All common keys can be accessed via `EASYTEST_${KEY}` variables.
+
+For custom keys, you may use `easytest_get_key(KEY DEST MAIN_SOURCE)`. It will search for `KEY` in `MAIN_SOURCE` and stores all matches in `DEST`. Remember to call this function for `KEY` and `KEY-CONFIG`, if the key may be defined global and per configuration.
+
 
 ## Contribute
 

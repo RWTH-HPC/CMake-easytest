@@ -151,12 +151,10 @@ function (easytest_add_test_config PREFIX CONFIG MAIN_SOURCE)
 	# Call the hooks for compile and test creation.
 	easytest_hook_compile(${EASYTEST_BIN_TARGET} ${CONFIG} ${MAIN_SOURCE}
 	                      ${ARGN})
-	easytest_hook_post_compile(${EASYTEST_BIN_TARGET} ${CONFIG} ${MAIN_SOURCE}
-	                           ${ARGN})
+	easytest_hook_post_compile(${EASYTEST_BIN_TARGET} ${CONFIG} ${MAIN_SOURCE})
 	easytest_hook_test(${EASYTEST_TEST_TARGET} ${EASYTEST_BIN_TARGET} ${CONFIG}
-	                   ${MAIN_SOURCE} ${ARGN})
-	easytest_hook_post_test(${EASYTEST_TEST_TARGET} ${CONFIG} ${MAIN_SOURCE}
-	                        ${ARGN})
+	                   ${MAIN_SOURCE})
+	easytest_hook_post_test(${EASYTEST_TEST_TARGET} ${CONFIG} ${MAIN_SOURCE})
 endfunction ()
 
 
