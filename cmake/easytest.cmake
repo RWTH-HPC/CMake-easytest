@@ -122,6 +122,13 @@ function (easytest_get_key KEY DEST FILE)
 			list(APPEND BUFFER "${LINE}")
 		endforeach()
 
+		# substitute variables set in key value.
+		string(REGEX MATCHALL "%[^% ]*" VAR_MATCHES "${BUFFER}")
+		foreach (MATCH ${VAR_MATCHES})
+			string(REPLACE "%" "" VARNAME "${MATCH}")
+			string(REPLACE "${MATCH}" "${${VARNAME}}" BUFFER "${BUFFER}")
+		endforeach ()
+
 		# Store the found matches in DEST (in parent scope).
 		set(${DEST} "${BUFFER}" PARENT_SCOPE)
 	endif ()
