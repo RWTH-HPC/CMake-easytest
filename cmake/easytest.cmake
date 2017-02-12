@@ -71,7 +71,11 @@ endmacro ()
 #   Additional arguments represent the source files for the executable to build.
 #
 macro (easytest_hook_test TARGET BINARY CONFIG)
-	add_test(${TARGET} ${BINARY})
+	if (EASYTEST_RUN)
+		add_test(NAME ${TARGET} COMMAND ${EASYTEST_RUN})
+	else ()
+		add_test(${TARGET} ${BINARY})
+	endif ()
 endmacro ()
 
 
@@ -123,7 +127,7 @@ function (easytest_get_key KEY DEST FILE)
 		endforeach()
 
 		# substitute variables set in key value.
-		string(REGEX MATCHALL "%[^% ]*" VAR_MATCHES "${BUFFER}")
+		string(REGEX MATCHALL "%[A-Za-z0-9_-]*" VAR_MATCHES "${BUFFER}")
 		foreach (MATCH ${VAR_MATCHES})
 			string(REPLACE "%" "" VARNAME "${MATCH}")
 			string(REPLACE "${MATCH}" "${${VARNAME}}" BUFFER "${BUFFER}")
@@ -150,23 +154,28 @@ endfunction ()
 #   compilation, but will not be evaluated.
 #
 function (easytest_add_test_config PREFIX CONFIG MAIN_SOURCE)
+	# Set common variables for this target.
+	set(TEST_TARGET "${PREFIX}-${CONFIG}")
+	set(BINARY "testbin-${TEST_TARGET}")
+
+
 	# Get individual config keys from main source file. Individual keys will
 	# override the global test key values.
 	foreach (KEY ${EASYLIST_COMMON_KEYS})
 		easytest_get_key(${KEY}-${CONFIG} EASYTEST_${KEY} ${MAIN_SOURCE})
 	endforeach ()
 
-	# Set the name of the targets to be used for test and binary.
-	set(EASYTEST_TEST_TARGET "${PREFIX}-${CONFIG}")
-	set(EASYTEST_BIN_TARGET "testbin-${EASYTEST_TEST_TARGET}")
+	# Postprocess RUN key, as add_test needs a list of arguments, but RUN is a
+	# string. This expression will replace spaces by colons to transform RUN
+	# into a list. Escaped spaces are ignored, but it can't handle quotes.
+	string(REGEX REPLACE "([^\\]) " "\\1;" EASYTEST_RUN "${EASYTEST_RUN}")
+
 
 	# Call the hooks for compile and test creation.
-	easytest_hook_compile(${EASYTEST_BIN_TARGET} ${CONFIG} ${MAIN_SOURCE}
-	                      ${ARGN})
-	easytest_hook_post_compile(${EASYTEST_BIN_TARGET} ${CONFIG} ${MAIN_SOURCE})
-	easytest_hook_test(${EASYTEST_TEST_TARGET} ${EASYTEST_BIN_TARGET} ${CONFIG}
-	                   ${MAIN_SOURCE})
-	easytest_hook_post_test(${EASYTEST_TEST_TARGET} ${CONFIG} ${MAIN_SOURCE})
+	easytest_hook_compile(${BINARY} ${CONFIG} ${MAIN_SOURCE} ${ARGN})
+	easytest_hook_post_compile(${BINARY} ${CONFIG} ${MAIN_SOURCE})
+	easytest_hook_test(${TEST_TARGET} ${BINARY} ${CONFIG} ${MAIN_SOURCE})
+	easytest_hook_post_test(${TEST_TARGET} ${CONFIG} ${MAIN_SOURCE})
 endfunction ()
 
 

@@ -78,14 +78,16 @@ The main (first) source file will be evaluated for the test configurations. Each
 * `COMPILE_FLAGS`: Add compile definitions for the test binary, e.g. `-DWITH_ERROR`.
 * `COMPILE_INCLUDES`: Add include directories for the test binary, e.g. `../src`.
 * `LINK`: Linker-flags for the test binary, e.g. to link against a library.
-* `RUN`: How to run the test.
+* `RUN`: How to run the test. If not set, the binary will be called without any arguments.
 * `ENVIRONMENT`: Environment variables for running the test.
 * `PASS`: Set the tests `PASS_REGULAR_EXPRESSION` attribute.
 * `FAIL`: Set the tests `FAIL_REGULAR_EXPRESSION` attribute.
 
 **Note:** It is not recommended to use `PASS` and `FAIL` for complex expressions over multiple lines. Consider to combine this module with tools like [LLVM FileCheck](http://llvm.org/docs/CommandGuide/FileCheck.html).
 
-The key values will be stripped from leading and trailing whitespace. Expressions in the format `%[^% ]` will be substituted by CMake variables with the same name (without the percentage sign).
+The key values will be stripped from leading and trailing whitespace. Expressions in the format `%[A-Za-z0-9_-]*` will be substituted by CMake variables with the same name (without the percentage sign). The following common expressions may be used to get test data:
+
+* `%BINARY`: The name of the test binary target. It may be used as first argument for `RUN` to call the binary or at any other position in conjunction with the CMake generator expression `$<TARGET_FILE:%BINARY>`.
 
 *Additional keys may be defined and evaluated by custom hooks (see below).*
 
