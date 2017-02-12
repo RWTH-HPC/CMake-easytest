@@ -29,14 +29,14 @@ int main()
  * CONFIGS: negative zero positive
  *
  *
- * negative-COMPILE: -DMYINT=-2
- * negative-PASS: 4
+ * COMPILE-negative: -DMYINT=-2
+ * PASS-negative: 4
  *
- * zero-COMPILE: -DMYINT=0
- * zero-PASS: 0
+ * COMPILE-zero: -DMYINT=0
+ * PASS-zero: 0
  *
- * positive-COMPILE: -DMYINT=2
- * positive-PASS: 4
+ * COMPILE-positive: -DMYINT=2
+ * PASS-positive: 4
  */
 ```
 
@@ -74,7 +74,7 @@ For adding a new test file, simply call `easy_add_test()` with the following par
 
 The main (first) source file will be evaluated for the test configurations. Each key must be  terminated with a colon. The following keys may be defined to set parameters for creating the tests. Except for `CONFIGS`, each key may be defined global as `KEY`, or for a specific configuration as `KEY-CONFIG`, where the configuration-specific key will overwrite the global value. Each key may be defined multiple times - the values will be stored in an array.
 
-* `CONFIGS`: Space-delimited list of configurations defined in this test file.
+* `CONFIGS`: Space-delimited list of configurations defined in this test file. *If neither this key, nor the parameter in `easy_add_test()` is set, `CONFIGS` will be set to `CHECK`.*
 * `COMPILE_FLAGS`: Add compile definitions for the test binary, e.g. `-DWITH_ERROR`.
 * `COMPILE_INCLUDES`: Add include directories for the test binary, e.g. `../src`.
 * `LINK`: Linker-flags for the test binary, e.g. to link against a library.
@@ -87,7 +87,7 @@ The main (first) source file will be evaluated for the test configurations. Each
 
 The key values will be stripped from leading and trailing whitespace. Expressions in the format `%[A-Za-z0-9_-]*` will be substituted by CMake variables with the same name (without the percentage sign). The following common expressions may be used to get test data:
 
-* `%BINARY`: Path to the binary. This is equivalent to `$<TARGET_FILE:testbin-${PREFIX}-${CONFIG}>`. *This expression can only be used in the configuration-specific keys!*
+* `%BINARY`: Path to the binary. This is equivalent to `$<TARGET_FILE:testbin-${PREFIX}-${CONFIG}>`. *This expression is available in configuration-specific keys, only!*
 
 *Additional keys may be defined and evaluated by custom hooks (see below).*
 
@@ -139,54 +139,54 @@ It may be necessary to modify steps of the test definition, e.g. to use a specia
 
 All common keys can be accessed via `EASYTEST_${KEY}` variables.
 
-For custom keys, you may use `easytest_get_key(KEY DEST MAIN_SOURCE)`. It will search for `KEY` in `MAIN_SOURCE` and stores all matches in `DEST`. Remember to call this function for `KEY` and `KEY-CONFIG`, if the key may be defined global and per configuration.
+To get custom keys for custom hooks you may use `easytest_get_key(KEY DEST MAIN_SOURCE)`. It will search for `KEY` in `MAIN_SOURCE` and stores all matches in `DEST`. Remember to call this function for `KEY` and `KEY-CONFIG`, if the key may be defined global and per configuration.
 
 
 ## Recommendations
 
 * Try to avoid using hooks for everything. E.g. if your tests use OpenMP, don't define the `easytest_hook_post_compile` hook for adding the OpenMP compiler flags, as they can be accessed with the `OpenMP_C_FLAGS` variable. You might consider using something like this:
 
-  ```C
-  #include <stdio.h>
-  #include <omp.h>
+```C
+#include <stdio.h>
+#include <omp.h>
 
-  int main ()
-  {
-	#pragma omp parallel
+int main ()
+{
+#pragma omp parallel
 	{
 		printf("%d of %d\n", omp_get_thread_num() + 1, omp_get_num_threads());
 	}
-  }
+}
 
-  /* CMake-easytest configuration.
-   *
-   * COMPILE_FLAGS: %OpenMP_C_FLAGS
-   * LINK: %OpenMP_C_FLAGS
-   */
-  ```
+/* CMake-easytest configuration.
+ *
+ * COMPILE_FLAGS: %OpenMP_C_FLAGS
+ * LINK: %OpenMP_C_FLAGS
+ */
+```
 
 * This also applies to the creation of tests: Instead of defining the `easytest_hook_test` hook to sort the output of the test case above by rank, you might consider to use variables:
 
-  ```CMake
-  include(easytest)
-  find_package(OpenMP REQUIRED)
+```CMake
+include(easytest)
+find_package(OpenMP REQUIRED)
 
-  set(sort "sort -n")
-  easy_add_test(PREFIX OpenMP_thread_num SOURCES openmp.c)
-  ```
+set(sort "sort -n")
+easy_add_test(PREFIX OpenMP_thread_num SOURCES openmp.c)
+```
 
-  And use them in the test file:
-  ```C
-  /* CMake-easytest configuration.
-   *
-   * COMPILE_FLAGS: %OpenMP_C_FLAGS
-   * LINK: %OpenMP_C_FLAGS
-   *
-   * ENVIRONMENT: OMP_NUM_THREADS=4
-   * RUN-CHECK: %BINARY | %sort
-   * PASS: 1.*2.*3.*4
-   */
-  ```
+And use them in the test file:
+```C
+/* CMake-easytest configuration.
+ *
+ * COMPILE_FLAGS: %OpenMP_C_FLAGS
+ * LINK: %OpenMP_C_FLAGS
+ *
+ * ENVIRONMENT: OMP_NUM_THREADS=4
+ * RUN-CHECK: %BINARY | %sort
+ * PASS: 1.*2.*3.*4
+ */
+```
 
 
 ## Contribute
