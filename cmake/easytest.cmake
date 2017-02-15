@@ -169,7 +169,9 @@ function (easytest_add_test_config PREFIX CONFIG MAIN_SOURCE)
 	# Postprocess RUN key, as add_test needs a list of arguments, but RUN is a
 	# string. To accomplish this and to allow pipes in the command, the whole
 	# string will be used as argument for sh.
-	set(EASYTEST_RUN sh -c "${EASYTEST_RUN}")
+	if (EASYTEST_RUN)
+		set(EASYTEST_RUN sh -c "${EASYTEST_RUN}")
+	endif ()
 
 
 	# Call the hooks for compile and test creation.
