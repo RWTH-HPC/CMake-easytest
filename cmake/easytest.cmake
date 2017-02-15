@@ -154,17 +154,25 @@ endfunction ()
 #   compilation, but will not be evaluated.
 #
 function (easytest_add_test_config PREFIX CONFIG MAIN_SOURCE)
-	# Set common variables for this target.
-	set(TEST_TARGET "${PREFIX}-${CONFIG}")
+	# Set target names.
+	set(TEST_TARGET "${PREFIX}")
+	if (CONFIG)
+		set(TEST_TARGET "${PREFIX}-${CONFIG}")
+	endif ()
 	set(BINARY_TARGET "testbin-${TEST_TARGET}")
+
+
+	# Set common variables for this target.
 	set(BINARY "$<TARGET_FILE:${BINARY_TARGET}>")
 
 
 	# Get individual config keys from main source file. Individual keys will
 	# override the global test key values.
-	foreach (KEY ${EASYLIST_COMMON_KEYS})
-		easytest_get_key(${KEY}-${CONFIG} EASYTEST_${KEY} ${MAIN_SOURCE})
-	endforeach ()
+	if (CONFIG)
+		foreach (KEY ${EASYLIST_COMMON_KEYS})
+			easytest_get_key(${KEY}-${CONFIG} EASYTEST_${KEY} ${MAIN_SOURCE})
+		endforeach ()
+	endif ()
 
 	# Postprocess RUN key, as add_test needs a list of arguments, but RUN is a
 	# string. To accomplish this and to allow pipes in the command, the whole
@@ -175,10 +183,10 @@ function (easytest_add_test_config PREFIX CONFIG MAIN_SOURCE)
 
 
 	# Call the hooks for compile and test creation.
-	easytest_hook_compile(${BINARY_TARGET} ${CONFIG} ${MAIN_SOURCE} ${ARGN})
-	easytest_hook_post_compile(${BINARY_TARGET} ${CONFIG} ${MAIN_SOURCE})
-	easytest_hook_test(${TEST_TARGET} ${BINARY_TARGET} ${CONFIG} ${MAIN_SOURCE})
-	easytest_hook_post_test(${TEST_TARGET} ${CONFIG} ${MAIN_SOURCE})
+	easytest_hook_compile(${BINARY_TARGET} "${CONFIG}" ${MAIN_SOURCE} ${ARGN})
+	easytest_hook_post_compile(${BINARY_TARGET} "${CONFIG}" ${MAIN_SOURCE})
+	easytest_hook_test(${TEST_TARGET} ${BINARY_TARGET} "${CONFIG}" ${MAIN_SOURCE})
+	easytest_hook_post_test(${TEST_TARGET} "${CONFIG}" ${MAIN_SOURCE})
 endfunction ()
 
 
@@ -220,7 +228,7 @@ function (easy_add_test)
 		# If still no configs could be found, use the default configuration with
 		# no label.
 		else ()
-			set(EASYTEST_CONFIGS "CHECK")
+			set(EASYTEST_CONFIGS "")
 		endif ()
 	endif ()
 
@@ -234,8 +242,12 @@ function (easy_add_test)
 
 
 	# Add a new test for each configuration.
-	foreach (CONFIG ${EASYTEST_CONFIGS})
-		easytest_add_test_config(${EASYTEST_PREFIX} ${CONFIG}
-		                         ${EASYTEST_SOURCES})
-	endforeach ()
+	if (EASYTEST_CONFIGS)
+		foreach (CONFIG ${EASYTEST_CONFIGS})
+			easytest_add_test_config(${EASYTEST_PREFIX} ${CONFIG}
+			                         ${EASYTEST_SOURCES})
+		endforeach ()
+	else ()
+		easytest_add_test_config(${EASYTEST_PREFIX} "" ${EASYTEST_SOURCES})
+	endif ()
 endfunction ()
