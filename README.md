@@ -53,7 +53,7 @@ To use CMake-easytest, simply add this repository as git submodule into your own
 mkdir externals
 git submodule add git://github.com/RWTH-ELP/CMake-easytest.git externals/CMake-easytest
 ```
-and adding ```externals/CMake-easytest/cmake``` to your ```CMAKE_MODULE_PATH```
+and ```externals/CMake-easytest/cmake``` to your ```CMAKE_MODULE_PATH```
 ```CMake
 set(CMAKE_MODULE_PATH
     "${PROJECT_SOURCE_DIR}/externals/CMake-easytest/cmake"
@@ -146,47 +146,49 @@ To get custom keys for custom hooks you may use `easytest_get_key(KEY DEST MAIN_
 
 * Try to avoid using hooks for everything. E.g. if your tests use OpenMP, don't define the `easytest_hook_post_compile` hook for adding the OpenMP compiler flags, as they can be accessed with the `OpenMP_C_FLAGS` variable. You might consider using something like this:
 
-```C
-#include <stdio.h>
-#include <omp.h>
+	```C
+	#include <stdio.h>
+	#include <omp.h>
 
-int main ()
-{
-#pragma omp parallel
+	int main ()
 	{
-		printf("%d of %d\n", omp_get_thread_num() + 1, omp_get_num_threads());
+	#pragma omp parallel
+		{
+			printf("%d of %d\n", omp_get_thread_num() + 1, omp_get_num_threads());
+		}
 	}
-}
 
-/* CMake-easytest configuration.
- *
- * COMPILE_FLAGS: %OpenMP_C_FLAGS
- * LINK: %OpenMP_C_FLAGS
- */
-```
+	/* CMake-easytest configuration.
+	 *
+	 * COMPILE_FLAGS: %OpenMP_C_FLAGS
+	 * LINK: %OpenMP_C_FLAGS
+	 */
+	```
 
 * This also applies to the creation of tests: Instead of defining the `easytest_hook_test` hook to sort the output of the test case above by rank, you might consider to use variables:
 
-```CMake
-include(easytest)
-find_package(OpenMP REQUIRED)
+	```CMake
+	include(easytest)
+	find_package(OpenMP REQUIRED)
 
-set(sort "sort -n")
-easy_add_test(PREFIX OpenMP_thread_num SOURCES openmp.c)
-```
+	set(sort "sort -n")
+	easy_add_test(PREFIX OpenMP_thread_num SOURCES openmp.c)
+	```
 
-And use them in the test file:
-```C
-/* CMake-easytest configuration.
- *
- * COMPILE_FLAGS: %OpenMP_C_FLAGS
- * LINK: %OpenMP_C_FLAGS
- *
- * ENVIRONMENT: OMP_NUM_THREADS=4
- * RUN-CHECK: %BINARY | %sort
- * PASS: 1.*2.*3.*4
- */
-```
+	And use them in the test file:
+	```C
+	/* CMake-easytest configuration.
+	 *
+	 * COMPILE_FLAGS: %OpenMP_C_FLAGS
+	 * LINK: %OpenMP_C_FLAGS
+	 *
+	 * ENVIRONMENT: OMP_NUM_THREADS=4
+	 * RUN-CHECK: %BINARY | %sort
+	 * PASS: 1.*2.*3.*4
+	 */
+	```
+
+* Don't fragment the test data: put as much information as possible into the test file to build and run the test. Otherwise, it quickly becomes incomprehensible, if the test configurations are spread over several files as CMake and CMake-easytest configurations.
 
 
 ## Contribute
