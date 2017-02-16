@@ -12,6 +12,7 @@
 # be used to get their values.
 #
 set(EASYLIST_COMMON_KEYS
+	DEPENDS          # Targets the binary target depends on.
 	COMPILE_FLAGS    # Flags for compiling the target.
 	COMPILE_INCLUDES # Directories to include for compiling target.
 	LINK             # Libraries to link on target.
@@ -55,6 +56,10 @@ macro (easytest_hook_post_compile TARGET CONFIG)
 	target_include_directories(${TARGET} PRIVATE ${EASYTEST_COMPILE_INCLUDES})
 	target_compile_options(${TARGET} PRIVATE ${EASYTEST_COMPILE_FLAGS})
 	target_link_libraries(${TARGET} ${EASYTEST_LINK})
+
+	if (EASYTEST_DEPENDS)
+		add_dependencies(${TARGET} ${EASYTEST_DEPENDS})
+	endif ()
 endmacro ()
 
 
