@@ -172,6 +172,11 @@ function (easytest_add_test_config PREFIX CONFIG MAIN_SOURCE)
 		foreach (KEY ${EASYLIST_COMMON_KEYS})
 			easytest_get_key(${KEY}-${CONFIG} EASYTEST_${KEY} ${MAIN_SOURCE})
 		endforeach ()
+
+	# If there are no individual configurations, reload the RUN key to parse
+	# the BINARY variable.
+	else ()
+		easytest_get_key(RUN EASYTEST_RUN ${MAIN_SOURCE})
 	endif ()
 
 	# Postprocess RUN key, as add_test needs a list of arguments, but RUN is a
