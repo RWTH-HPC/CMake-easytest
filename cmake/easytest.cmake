@@ -195,8 +195,12 @@ function (easytest_add_test_config PREFIX CONFIG MAIN_SOURCE)
 
 
 	# Call the hooks for compile and test creation.
-	easytest_hook_compile(${BINARY_TARGET} "${CONFIG}" ${MAIN_SOURCE} ${ARGN})
-	easytest_hook_post_compile(${BINARY_TARGET} "${CONFIG}" ${MAIN_SOURCE})
+	if (NOT EASYTEST_NOBINARY)
+		easytest_hook_compile(${BINARY_TARGET} "${CONFIG}" ${MAIN_SOURCE}
+		                      ${ARGN})
+		easytest_hook_post_compile(${BINARY_TARGET} "${CONFIG}" ${MAIN_SOURCE})
+	endif ()
+
 	easytest_hook_test(${TEST_TARGET} ${BINARY_TARGET} "${CONFIG}"
 	                   ${MAIN_SOURCE})
 	easytest_hook_post_test(${TEST_TARGET} "${CONFIG}" ${MAIN_SOURCE})
@@ -214,11 +218,12 @@ endfunction ()
 #   CONFIGS Configs to run. (optional)
 #
 function (easy_add_test)
-	# Evaluate the
+	# Evaluate the arguments.
+	set(options NOBINARY)
 	set(oneValueArgs PREFIX)
 	set(multiValueArgs SOURCES CONFIGS)
-	cmake_parse_arguments(EASYTEST "" "${oneValueArgs}" "${multiValueArgs}"
-	                      ${ARGN})
+	cmake_parse_arguments(EASYTEST "${options}" "${oneValueArgs}"
+	                      "${multiValueArgs}" ${ARGN})
 
 	# Check if required variables have been set.
 	foreach (VAR PREFIX SOURCES)

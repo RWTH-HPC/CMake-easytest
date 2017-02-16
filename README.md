@@ -69,6 +69,7 @@ For adding a new test file, simply call `easy_add_test()` with the following par
 * `PREFIX`: *(required)* Prefix for tests. Tests will be named `${PREFIX}_${CONFIG}`.
 * `SOURCES`: *(required)* Source files for the test binary. Only the first file is evaluated for the easytest configuration, additional files will be used for compilation only.
 * `CONFIGS`: Set configurations to add test cases for. If not defined, the `CONFIGS` key in the main source file will be used. *It is recommended to use this option only, if not all configurations defined in the main source file should be handled.*
+* `NOBINARY`: Do not build a binary. This may be useful for testing a binary build in other parts of your project. *Enabling this flag will result in not calling the compile and post-compile hooks.*
 
 #### Configuration in main source file
 
