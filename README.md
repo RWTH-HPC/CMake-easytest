@@ -72,7 +72,7 @@ For adding a new test file, simply call `easy_add_test()` with the following par
 
 #### Configuration in main source file
 
-The main (first) source file will be evaluated for the test configurations. Each key must be  terminated with a colon. The following keys may be defined to set parameters for creating the tests. Except for `CONFIGS`, each key may be defined global as `KEY`, or for a specific configuration as `KEY-CONFIG`, where the configuration-specific key will overwrite the global value. Each key may be defined multiple times - the values will be stored in an array.
+The main (first) source file will be evaluated for the test configurations. Each key must be  terminated with a colon. The following keys may be defined to set parameters for creating the tests. Except for `CONFIGS`, each key may be defined global as `KEY`, or for a specific configuration as `KEY-CONFIG`, where the configuration-specific key will overwrite the global value. Each key may be defined multiple times - the values will be concatenated (delimited by a single space).
 
 * `CONFIGS`: Space-delimited list of configurations defined in this test file. *If neither this key, nor the parameter in `easy_add_test()` is set, `CONFIGS` will be left blank and only one test named `PREFIX` will be created.*
 * `COMPILE_FLAGS`: Add compile definitions for the test binary, e.g. `-DWITH_ERROR`.

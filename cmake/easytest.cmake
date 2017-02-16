@@ -123,7 +123,7 @@ function (easytest_get_key KEY DEST FILE)
 		foreach(LINE ${TMP})
 			string(REGEX REPLACE ".*${KEY}:(.*)$" "\\1" LINE "${LINE}")
 			string(STRIP "${LINE}" LINE)
-			list(APPEND BUFFER "${LINE}")
+			set(BUFFER "${BUFFER} ${LINE}")
 		endforeach()
 
 		# substitute variables set in key value.
@@ -132,6 +132,8 @@ function (easytest_get_key KEY DEST FILE)
 			string(REPLACE "%" "" VARNAME "${MATCH}")
 			string(REPLACE "${MATCH}" "${${VARNAME}}" BUFFER "${BUFFER}")
 		endforeach ()
+
+		string(STRIP "${BUFFER}" BUFFER)
 
 		# Store the found matches in DEST (in parent scope).
 		set(${DEST} "${BUFFER}" PARENT_SCOPE)
@@ -179,6 +181,7 @@ function (easytest_add_test_config PREFIX CONFIG MAIN_SOURCE)
 		easytest_get_key(RUN EASYTEST_RUN ${MAIN_SOURCE})
 	endif ()
 
+
 	# Postprocess RUN key, as add_test needs a list of arguments, but RUN is a
 	# string. To accomplish this and to allow pipes in the command, the whole
 	# string will be used as argument for sh.
@@ -186,11 +189,17 @@ function (easytest_add_test_config PREFIX CONFIG MAIN_SOURCE)
 		set(EASYTEST_RUN sh -c "${EASYTEST_RUN}")
 	endif ()
 
+	# Postprocess COMPILE_INCLUDES key, as it must be a list, but
+	# COMPILE_INCLUDES may be a space delimited string.
+	string(REPLACE " " ";" EASYTEST_COMPILE_INCLUDES
+	               "${EASYTEST_COMPILE_INCLUDES}")
+
 
 	# Call the hooks for compile and test creation.
 	easytest_hook_compile(${BINARY_TARGET} "${CONFIG}" ${MAIN_SOURCE} ${ARGN})
 	easytest_hook_post_compile(${BINARY_TARGET} "${CONFIG}" ${MAIN_SOURCE})
-	easytest_hook_test(${TEST_TARGET} ${BINARY_TARGET} "${CONFIG}" ${MAIN_SOURCE})
+	easytest_hook_test(${TEST_TARGET} ${BINARY_TARGET} "${CONFIG}"
+	                   ${MAIN_SOURCE})
 	easytest_hook_post_test(${TEST_TARGET} "${CONFIG}" ${MAIN_SOURCE})
 endfunction ()
 
