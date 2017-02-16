@@ -27,12 +27,12 @@ int main()
  *
  * CONFIGS: sort env
  *
- * COMPILE_FLAGS: %OpenMP_C_FLAGS
- * LINK: %OpenMP_C_FLAGS
+ * COMPILE_FLAGS: @OpenMP_C_FLAGS@
+ * LINK: @OpenMP_C_FLAGS@
  *
  *
  * ENVIRONMENT-sort: OMP_NUM_THREADS=4
- * RUN-sort: %BINARY | %sort
+ * RUN-sort: @BINARY@ | @sort@
  * PASS-sort: 1.*2.*3.*4
  *
  * ENVIRONMENT-env: OMP_NUM_THREADS=1
