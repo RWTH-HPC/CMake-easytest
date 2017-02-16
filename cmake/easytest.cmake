@@ -123,16 +123,9 @@ function (easytest_get_key KEY DEST FILE)
 		foreach(LINE ${TMP})
 			string(REGEX REPLACE ".*${KEY}:(.*)$" "\\1" LINE "${LINE}")
 			string(STRIP "${LINE}" LINE)
+			string(CONFIGURE "${LINE}" LINE @ONLY)
 			set(BUFFER "${BUFFER} ${LINE}")
 		endforeach()
-
-		# substitute variables set in key value.
-		string(REGEX MATCHALL "%[A-Za-z0-9_-]*" VAR_MATCHES "${BUFFER}")
-		foreach (MATCH ${VAR_MATCHES})
-			string(REPLACE "%" "" VARNAME "${MATCH}")
-			string(REPLACE "${MATCH}" "${${VARNAME}}" BUFFER "${BUFFER}")
-		endforeach ()
-
 		string(STRIP "${BUFFER}" BUFFER)
 
 		# Store the found matches in DEST (in parent scope).

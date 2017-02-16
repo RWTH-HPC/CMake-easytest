@@ -85,9 +85,11 @@ The main (first) source file will be evaluated for the test configurations. Each
 
 **Note:** It is not recommended to use `PASS` and `FAIL` for complex expressions over multiple lines. Consider to combine this module with tools like [LLVM FileCheck](http://llvm.org/docs/CommandGuide/FileCheck.html).
 
-The key values will be stripped from leading and trailing whitespace. Expressions in the format `%[A-Za-z0-9_-]*` will be substituted by CMake variables with the same name (without the percentage sign). The following common expressions may be used to get test data:
+The key values will be stripped from leading and trailing whitespace.
 
-* `%BINARY`: Path to the binary. This is equivalent to `$<TARGET_FILE:testbin-${PREFIX}-${CONFIG}>`. *If `CONFIGS` is nn-empty, this expression is available in configuration-specific keys, only!*
+As for CMake's `configure_file`, you may use `@VAR@` to use variables to be substituted. The following variables are available to get some information about the test to be built:
+
+* `@BINARY@`: Path to the binary. This is equivalent to `$<TARGET_FILE:testbin-${PREFIX}-${CONFIG}>`. *If `CONFIGS` is non-empty, this expression is available in configuration-specific keys, only!*
 
 *Additional keys may be defined and evaluated by custom hooks (see below).*
 
