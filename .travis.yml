@@ -10,9 +10,18 @@
 language: c
 compiler: gcc
 
-os: linux
-dist: trusty
-sudo: false
+matrix:
+  include:
+  - os: linux
+    dist: trusty
+    sudo: false
+
+addons:
+  apt:
+    sources:
+      - kalakris-cmake
+    packages:
+      - cmake
 
 script:
   - mkdir travis && cd travis

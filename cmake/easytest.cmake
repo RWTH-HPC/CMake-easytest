@@ -53,9 +53,18 @@ endmacro ()
 #   Additional arguments represent the source files for the executable to build.
 #
 macro (easytest_hook_post_compile TARGET CONFIG)
-	target_include_directories(${TARGET} PRIVATE ${EASYTEST_COMPILE_INCLUDES})
-	target_compile_options(${TARGET} PRIVATE ${EASYTEST_COMPILE_FLAGS})
-	target_link_libraries(${TARGET} ${EASYTEST_LINK})
+	if (EASYTEST_COMPILE_INCLUDES)
+		target_include_directories(${TARGET} PRIVATE
+		                           ${EASYTEST_COMPILE_INCLUDES})
+	endif()
+
+	if (EASYTEST_COMPILE_FLAGS)
+		target_compile_options(${TARGET} PRIVATE ${EASYTEST_COMPILE_FLAGS})
+	endif ()
+
+	if (EASYTEST_LINK)
+		target_link_libraries(${TARGET} ${EASYTEST_LINK})
+	endif ()
 
 	if (EASYTEST_DEPENDS)
 		add_dependencies(${TARGET} ${EASYTEST_DEPENDS})
