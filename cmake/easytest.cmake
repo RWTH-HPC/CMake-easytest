@@ -203,7 +203,7 @@ function (easytest_add_test_config PREFIX CONFIG MAIN_SOURCE)
 
 	# If a setup hook is defined, call it to set custom variables and reload all
 	# common keys.
-	if (DEFINED easytest_hook_setup)
+	if (COMMAND easytest_hook_setup)
 		easytest_hook_setup(${TEST_TARGET} ${BINARY_TARGET} "${CONFIG}"
 		                    ${MAIN_SOURCE})
 		easytest_get_common_keys(${MAIN_SOURCE})
