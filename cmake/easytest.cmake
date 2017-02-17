@@ -140,6 +140,35 @@ function (easytest_get_key KEY DEST FILE)
 endfunction ()
 
 
+# Get common keys from FILE.
+#
+# This function will be used to search for all common keys (with configuration
+# specific values) in FILE.
+#
+# Parameters:
+#   FILE Where to search.
+#
+macro (easytest_get_common_keys FILE)
+	foreach (KEY ${EASYLIST_COMMON_KEYS})
+		easytest_get_key(${KEY} EASYTEST_${KEY} ${FILE})
+		easytest_get_key(${KEY}-${CONFIG} EASYTEST_${KEY} ${FILE})
+	endforeach ()
+
+
+	# Postprocess RUN key, as add_test needs a list of arguments, but RUN is a
+	# string. To accomplish this and to allow pipes in the command, the whole
+	# string will be used as argument for sh.
+	if (EASYTEST_RUN)
+		set(EASYTEST_RUN sh -c "${EASYTEST_RUN}")
+	endif ()
+
+	# Postprocess COMPILE_INCLUDES key, as it must be a list, but
+	# COMPILE_INCLUDES may be a space delimited string.
+	string(REPLACE " " ";" EASYTEST_COMPILE_INCLUDES
+	               "${EASYTEST_COMPILE_INCLUDES}")
+endmacro ()
+
+
 # Add a new test configuration.
 #
 # This function will add a new testcase for a source file with a given
@@ -169,43 +198,25 @@ function (easytest_add_test_config PREFIX CONFIG MAIN_SOURCE)
 
 	# Get individual config keys from main source file. Individual keys will
 	# override the global test key values.
-	if (CONFIG)
-		foreach (KEY ${EASYLIST_COMMON_KEYS})
-			easytest_get_key(${KEY}-${CONFIG} EASYTEST_${KEY} ${MAIN_SOURCE})
-		endforeach ()
-
-	# If there are no individual configurations, reload the RUN key to parse
-	# the BINARY variable.
-	else ()
-		easytest_get_key(RUN EASYTEST_RUN ${MAIN_SOURCE})
-	endif ()
+	easytest_get_common_keys(${MAIN_SOURCE})
 
 
-	# Postprocess RUN key, as add_test needs a list of arguments, but RUN is a
-	# string. To accomplish this and to allow pipes in the command, the whole
-	# string will be used as argument for sh.
-	if (EASYTEST_RUN)
-		set(EASYTEST_RUN sh -c "${EASYTEST_RUN}")
-	endif ()
-
-	# Postprocess COMPILE_INCLUDES key, as it must be a list, but
-	# COMPILE_INCLUDES may be a space delimited string.
-	string(REPLACE " " ";" EASYTEST_COMPILE_INCLUDES
-	               "${EASYTEST_COMPILE_INCLUDES}")
-
-
-	# Call the hooks for compile and test creation.
+	# If a setup hook is defined, call it to set custom variables and reload all
+	# common keys.
 	if (DEFINED easytest_hook_setup)
 		easytest_hook_setup(${TEST_TARGET} ${BINARY_TARGET} "${CONFIG}"
 		                    ${MAIN_SOURCE})
+		easytest_get_common_keys(${MAIN_SOURCE})
 	endif ()
 
+	# If not disabled, build a new binary for this test case.
 	if (NOT EASYTEST_NOBINARY)
 		easytest_hook_compile(${BINARY_TARGET} "${CONFIG}" ${MAIN_SOURCE}
 		                      ${ARGN})
 		easytest_hook_post_compile(${BINARY_TARGET} "${CONFIG}" ${MAIN_SOURCE})
 	endif ()
 
+	# Add a new test for this test case.
 	easytest_hook_test(${TEST_TARGET} ${BINARY_TARGET} "${CONFIG}"
 	                   ${MAIN_SOURCE})
 	easytest_hook_post_test(${TEST_TARGET} "${CONFIG}" ${MAIN_SOURCE})
@@ -254,14 +265,6 @@ function (easy_add_test)
 			set(EASYTEST_CONFIGS "")
 		endif ()
 	endif ()
-
-
-	# Search for main configuration keys in main source file. The found values
-	# may be overridden by individual config keys.
-	list(GET EASYTEST_SOURCES 0 MAIN_SOURCE)
-	foreach (KEY ${EASYLIST_COMMON_KEYS})
-		easytest_get_key(${KEY} EASYTEST_${KEY} ${MAIN_SOURCE})
-	endforeach ()
 
 
 	# Add a new test for each configuration.

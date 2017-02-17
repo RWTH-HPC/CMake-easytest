@@ -91,7 +91,7 @@ The key values will be stripped from leading and trailing whitespace.
 
 As for CMake's `configure_file`, you may use `@VAR@` to use variables to be substituted. The following variables are available to get some information about the test to be built:
 
-* `@BINARY@`: Path to the binary. This is equivalent to `$<TARGET_FILE:testbin-${PREFIX}-${CONFIG}>`. *If `CONFIGS` is non-empty, this expression is available in configuration-specific keys, only!*
+* `@BINARY@`: Path to the binary. This is equivalent to `$<TARGET_FILE:testbin-${PREFIX}-${CONFIG}>`.
 
 *Additional keys may be defined and evaluated by custom hooks (see below).*
 
@@ -102,6 +102,8 @@ It may be necessary to modify steps of the test definition, e.g. to use a specia
 * `easytest_hook_setup(TEST_TARGET BINARY_TARGET CONFIG MAIN_SOURCE)`
 
   This hook may be used to setup variables before all other hooks beeing called. The intention is to e.g. set variables depending on the configuration and re-read other keys that may use one or more of these variables.
+
+  If this hook is defined, all common keys will be re-read after calling this hook.
 
   **Parameters:**
   * `TEST_TARGET`: Test target name.
