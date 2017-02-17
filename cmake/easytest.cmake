@@ -195,6 +195,11 @@ function (easytest_add_test_config PREFIX CONFIG MAIN_SOURCE)
 
 
 	# Call the hooks for compile and test creation.
+	if (DEFINED easytest_hook_setup)
+		easytest_hook_setup(${TEST_TARGET} ${BINARY_TARGET} "${CONFIG}"
+		                    ${MAIN_SOURCE})
+	endif ()
+
 	if (NOT EASYTEST_NOBINARY)
 		easytest_hook_compile(${BINARY_TARGET} "${CONFIG}" ${MAIN_SOURCE}
 		                      ${ARGN})

@@ -99,6 +99,18 @@ As for CMake's `configure_file`, you may use `@VAR@` to use variables to be subs
 
 It may be necessary to modify steps of the test definition, e.g. to use a special command for building the test binary. To accomplish this, you may define the following hooks to **override** the internal ones:
 
+* `easytest_hook_setup(TEST_TARGET BINARY_TARGET CONFIG MAIN_SOURCE)`
+
+  This hook may be used to setup variables before all other hooks beeing called. The intention is to e.g. set variables depending on the configuration and re-read other keys that may use one or more of these variables.
+
+  **Parameters:**
+  * `TEST_TARGET`: Test target name.
+  * `BINARY_TARGET`: Binary target name.
+  * `CONFIG`: The configuration to build. You may use this to search for custom keys (see below). *You don't need to search for common keys, as these have been searched before. Access them via `EASYTEST_${KEY}`.*
+  * `MAIN_SOURCE`: The main source file, where to search for configuration keys and other data.
+
+  **Note:** You must not use this hook to set variables that don't change per configuration. Common variables may be set via the normal `set()` command before calling `easy_add_test()`.
+
 * `easytest_hook_compile(TARGET CONFIG MAIN_SOURCE ...)`
 
   This hook adds a new executable target for test configuration `CONFIG`. It may be replaced to call a custom build script.
