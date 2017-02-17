@@ -166,6 +166,11 @@ macro (easytest_get_common_keys FILE)
 	# COMPILE_INCLUDES may be a space delimited string.
 	string(REPLACE " " ";" EASYTEST_COMPILE_INCLUDES
 	               "${EASYTEST_COMPILE_INCLUDES}")
+
+	# Postprocess COMPILE_FLAGS key, as it must be a list, but COMPILE_FLAGS may
+	# be a space delimited string.
+	string(REPLACE " " ";" EASYTEST_COMPILE_FLAGS
+	               "${EASYTEST_COMPILE_FLAGS}")
 endmacro ()
 
 
