@@ -97,7 +97,7 @@ As for CMake's `configure_file`, you may use `@VAR@` to use variables to be subs
 
 ## Hooks
 
-It may be necessary to modify steps of the test definition, e.g. to use a special command for building the test binary. To accomplish this, you may define the following hooks to **override** the internal ones:
+It may be necessary to modify steps of the test definition, e.g. to use a special command for building the test binary. To accomplish this, you may define the following macros to **override** the internal ones:
 
 * `easytest_hook_setup(TEST_TARGET BINARY_TARGET CONFIG MAIN_SOURCE)`
 
