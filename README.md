@@ -3,6 +3,7 @@
 [![Travis](https://img.shields.io/travis/RWTH-ELP/CMake-easytest/master.svg?style=flat-square)](https://travis-ci.org/RWTH-ELP/CMake-easytest)
 [![](https://img.shields.io/github/issues-raw/RWTH-ELP/CMake-easytest.svg?style=flat-square)](https://github.com/RWTH-ELP/CMake-easytest/issues)
 [![BSD (3-clause)](http://img.shields.io/badge/license-3--clause_BSD-blue.svg?style=flat-square)](LICENSE)
+[![CMake 2.8.11 required](http://img.shields.io/badge/CMake_required-2.8.11-lightgrey.svg?style=flat-square)](LICENSE)
 
 CMake module for easy test integration.
 
