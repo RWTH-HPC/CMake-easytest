@@ -260,6 +260,14 @@ function (easy_add_test)
 	endforeach ()
 
 
+	# Check if source files can be accessed.
+	foreach (FILE IN LISTS EASYTEST_SOURCES)
+		if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${FILE}")
+			message(FATAL_ERROR "Can't read ${FILE}.")
+		endif ()
+	endforeach ()
+
+
 	# If no configs defined as parameter, search in first source file for
 	# CONFIGS keyword and use these configs.
 	if (NOT EASYTEST_CONFIGS)
