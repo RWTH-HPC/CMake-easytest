@@ -93,6 +93,7 @@ The key values will be stripped from leading and trailing whitespace.
 As for CMake's `configure_file`, you may use `@VAR@` to use variables to be substituted. The following variables are available to get some information about the test to be built:
 
 * `@BINARY@`: Path to the binary. This is equivalent to `$<TARGET_FILE:testbin-${PREFIX}-${CONFIG}>`.
+* `@SOURCEFILE@`: Path to the main source file.
 
 *Additional keys may be defined and evaluated by custom hooks (see below).*
 

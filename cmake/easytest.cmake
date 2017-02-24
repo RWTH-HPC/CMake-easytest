@@ -204,6 +204,7 @@ function (easytest_add_test_config PREFIX CONFIG MAIN_SOURCE)
 
 	# Set common variables for this target.
 	set(BINARY "$<TARGET_FILE:${BINARY_TARGET}>")
+	set(SOURCEFILE "${CMAKE_CURRENT_SOURCE_DIR}/${MAIN_SOURCE}")
 
 
 	# Get individual config keys from main source file. Individual keys will
