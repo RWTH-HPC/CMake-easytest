@@ -1,8 +1,8 @@
 # CMake-easytest
 
-[![Travis](https://img.shields.io/travis/RWTH-ELP/CMake-easytest/master.svg?style=flat-square)](https://travis-ci.org/RWTH-ELP/CMake-easytest)
-[![](https://img.shields.io/github/issues-raw/RWTH-ELP/CMake-easytest.svg?style=flat-square)](https://github.com/RWTH-ELP/CMake-easytest/issues)
-[![BSD (3-clause)](http://img.shields.io/badge/license-3--clause_BSD-blue.svg?style=flat-square)](LICENSE)
+[![Travis](https://img.shields.io/travis/RWTH-HPC/CMake-easytest/master.svg?style=flat-square)](https://travis-ci.org/RWTH-HPC/CMake-easytest)
+[![](https://img.shields.io/github/issues-raw/RWTH-HPC/CMake-easytest.svg?style=flat-square)](https://github.com/RWTH-HPC/CMake-easytest/issues)
+[![](http://img.shields.io/badge/license-3--clause_BSD-blue.svg?style=flat-square)](LICENSE)
 [![CMake 2.8.11 required](http://img.shields.io/badge/CMake_required-2.8.11-lightgrey.svg?style=flat-square)](LICENSE)
 
 CMake module for easy test integration.
@@ -52,7 +52,7 @@ easy_add_test(PREFIX myquad SOURCES test.c myquad.c)
 To use CMake-easytest, simply add this repository as git submodule into your own repository
 ```Shell
 mkdir externals
-git submodule add git://github.com/RWTH-ELP/CMake-easytest.git externals/CMake-easytest
+git submodule add git://github.com/RWTH-HPC/CMake-easytest.git externals/CMake-easytest
 ```
 and ```externals/CMake-easytest/cmake``` to your ```CMAKE_MODULE_PATH```
 ```CMake
@@ -215,7 +215,7 @@ To get custom keys for custom hooks you may use `easytest_get_key(KEY DEST MAIN_
 
 Anyone is welcome to contribute. Simply fork this repository, make your changes **in an own branch** and create a pull-request for your change. Please do only one feature per pull-request.
 
-You found a bug? Please fill out an [issue](https://github.com/RWTH-ELP/CMake-easytest/issues) and include all data to reproduce the bug.
+You found a bug? Please fill out an [issue](https://github.com/RWTH-HPC/CMake-easytest/issues) and include all data to reproduce the bug.
 
 #### Contributors
 
