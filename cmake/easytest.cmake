@@ -7,6 +7,10 @@
 # Written by Alexander Haase, alexander.haase@rwth-aachen.de
 #
 
+# Set the minimum required CMake version.
+cmake_minimum_required(VERSION 2.8.11)
+
+
 # The following keys will be searched in the tests main source file. Tests may
 # use additional keywords, but won't get extracted by default so hooks have to
 # be used to get their values.
