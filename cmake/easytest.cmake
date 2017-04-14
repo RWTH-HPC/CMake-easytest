@@ -176,6 +176,7 @@ macro (easytest_get_common_keys FILE)
 	# COMPILE_INCLUDES may be a space delimited string.
 	string(REPLACE " " ";" EASYTEST_COMPILE_INCLUDES
 	               "${EASYTEST_COMPILE_INCLUDES}")
+	string(REPLACE " " ";" EASYTEST_LINK "${EASYTEST_LINK}")
 endmacro ()
 
 
