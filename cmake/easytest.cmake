@@ -181,6 +181,7 @@ macro (easytest_get_common_keys FILE)
 	string(REPLACE " " ";" EASYTEST_COMPILE_INCLUDES
 	               "${EASYTEST_COMPILE_INCLUDES}")
 	string(REPLACE " " ";" EASYTEST_LINK "${EASYTEST_LINK}")
+	string(REPLACE " " ";" EASYTEST_ENVIRONMENT "${EASYTEST_ENVIRONMENT}")
 endmacro ()
 
 
