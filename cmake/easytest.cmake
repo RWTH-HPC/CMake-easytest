@@ -20,7 +20,6 @@ set(EASYLIST_COMMON_KEYS
 	COMPILE_FLAGS    # Flags for compiling the target.
 	COMPILE_INCLUDES # Directories to include for compiling target.
 	LINK             # Libraries to link on target.
-	LINKER_FLAGS     # Flags for linking the target.
 
 	RUN         # How to run the test.
 	ENVIRONMENT # Environment variables for running the test.
@@ -180,8 +179,9 @@ macro (easytest_get_common_keys FILE)
 	# COMPILE_INCLUDES may be a space delimited string.
 	string(REPLACE " " ";" EASYTEST_COMPILE_INCLUDES
 	               "${EASYTEST_COMPILE_INCLUDES}")
-	string(REPLACE " " ";" EASYTEST_LINK "${EASYTEST_LINK}")
+	string(REPLACE " " ";" EASYTEST_DEPENDS "${EASYTEST_DEPENDS}")
 	string(REPLACE " " ";" EASYTEST_ENVIRONMENT "${EASYTEST_ENVIRONMENT}")
+	string(REPLACE " " ";" EASYTEST_LINK "${EASYTEST_LINK}")
 endmacro ()
 
 
