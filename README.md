@@ -80,7 +80,8 @@ The main (first) source file will be evaluated for the test configurations. Each
 * `DEPENDS`:  Targets the binary target depends on.
 * `COMPILE_FLAGS`: Add compile definitions for the test binary, e.g. `-DWITH_ERROR`.
 * `COMPILE_INCLUDES`: Add include directories for the test binary, e.g. `../src`.
-* `LINK`: Linker-flags for the test binary, e.g. to link against a library.
+* `LINK`: List of libraries to link the binary against.
+* `LINK_FLAGS`: Linker flags for binary.
 * `RUN`: How to run the test. If not set, the binary will be called without any arguments.
 * `ENVIRONMENT`: Environment variables for running the test.
 * `PASS`: Set the tests `PASS_REGULAR_EXPRESSION` attribute.

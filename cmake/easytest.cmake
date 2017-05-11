@@ -20,6 +20,7 @@ set(EASYLIST_COMMON_KEYS
 	COMPILE_FLAGS    # Flags for compiling the target.
 	COMPILE_INCLUDES # Directories to include for compiling target.
 	LINK             # Libraries to link on target.
+	LINK_FLAGS       # Flags for linking the target.
 
 	RUN         # How to run the test.
 	ENVIRONMENT # Environment variables for running the test.
@@ -40,6 +41,13 @@ set(EASYLIST_COMMON_KEYS
 #   Additional arguments represent the source files for the executable to build.
 #
 macro (easytest_hook_compile TARGET CONFIG)
+	if (EASYTEST_LINK_FLAGS)
+		foreach (VAR CMAKE_EXE_LINKER_FLAGS CMAKE_MODULE_LINKER_FLAGS
+		             CMAKE_SHARED_LINKER_FLAGS CMAKE_STATIC_LINKER_FLAGS)
+			set(CMAKE_EXE_LINKER_FLAGS "${${VAR}} ${EASYTEST_LINK_FLAGS}")
+		endforeach ()
+	endif ()
+
 	add_executable(${TARGET} ${ARGN})
 endmacro ()
 
