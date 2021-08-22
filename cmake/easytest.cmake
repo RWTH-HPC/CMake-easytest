@@ -8,7 +8,7 @@
 #
 
 # Set the minimum required CMake version.
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 2.8.12)
 
 
 # The following keys will be searched in the tests main source file. Tests may
